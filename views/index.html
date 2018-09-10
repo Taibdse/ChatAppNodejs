@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.min.css">
+  <title>Chat Application</title>
+</head>
+
+<body>
+  <h1 class="text-center py-2 bg-success">Chat Application</h1>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <ul class="list-group" id="listUsers">
+          <li class="list-group-item">Bui Duc Tai</li>
+          <li class="list-group-item">Le Thi Ca Chua</li>
+          <li class="list-group-item">Le Cam Tu</li>
+        </ul>
+      </div>
+      <div class="col-md-8">
+          <ul class="list-group" style="height: 600px; overflow-y: auto" id="listMessages">
+            <li class="list-group-item">Bui Duc Tai</li>
+            <li class="list-group-item">Le Thi Ca Chua</li>
+            <li class="list-group-item">Le Cam Tu</li>
+          </ul>
+          <div class="chart-input">
+            <form action="" id="formSMSContent">
+                <div class="form-group">
+                  <label for="">Enter your message</label>
+                 <textarea name="" id="txtSMSContent" cols="30" rows="10" class="form-control" placeholder="Enter anything..."></textarea>
+                </div>
+                <button class="btn btn-success btn-block">Send</button>
+            </form>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script> 
+  <script>
+    const socket = io.connect("/");
+    console.log(socket);
+
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+    <script>
+
+      $(() => {
+        getUsersAndMessages();
+      })
+
+      async function getUsersAndMessages(){
+        let url = '/getUsersVsMessages';
+        let method = 'get';
+        try {
+          let res = await $.ajax({ url, method });
+          let { users, messages } = res;
+          renderUsers(users);
+          renderMessages(messages);
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+
+      function renderUsers(users){
+        $('#listUsers').html('');
+        users.forEach(user => {
+          $('#listUsers').append(`<li class="list-group-item">${user}</li>`)
+        })
+      }
+
+      function renderMessages(messages){
+        $('#listMessages').html('');
+        messages.forEach(message => {
+          $('#listMessages').append(`<li class="list-group-item">${message}</li>`)
+        })
+      }
+
+      socket.on('SERVER_ADD_NEW_USER',  renderUsers);
+      socket.on('SERVER_ADD_NEW_MESSAGE', renderMessages);
+
+
+    </script>
+</body>
+
+</html>
